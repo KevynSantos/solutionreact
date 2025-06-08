@@ -1,24 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+
 type FormData = {
-  nome: string;
+  name: string;
   cpf: string;
-  cep: string;
-  logradouro: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
+  postalCode: string;
+  street: string;
+  neighborhood: string;
+  city: string;
+  state: string;
 };
 
 const defaultForm: FormData = {
-  nome: '',
+  name: '',
   cpf: '',
-  cep: '',
-  logradouro: '',
-  bairro: '',
-  cidade: '',
-  estado: '',
+  postalCode: '',
+  street: '',
+  neighborhood: '',
+  city: '',
+  state: '',
 };
 
 export default function ClientFormPage() {
@@ -34,11 +35,17 @@ export default function ClientFormPage() {
       if (id && id !== 'new') {
         setLoading(true);
         try {
-          const res = await fetch(`/api/clients/${id}`);
+          const apiUrl = import.meta.env.VITE_API_URL;
+          const res = await fetch(apiUrl+`/user/findOne?id=${id}`);
           if (res.ok) {
-            const data: FormData = await res.json();
-            setForm(data);
-            setIsEdit(true);
+            const json = await res.json();
+            if(json.user != null)
+            {
+                const data: FormData = json.user;
+                setForm(data);
+                setIsEdit(true);
+            }
+            
           } else {
             console.warn('Cliente não encontrado, permanecendo em modo de cadastro.');
           }
@@ -67,8 +74,9 @@ export default function ClientFormPage() {
     e.preventDefault();
 
     try {
-      const url = isEdit ? `/api/clients/${id}` : '/api/clients';
-      const method = isEdit ? 'PUT' : 'POST';
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const url = isEdit ? apiUrl+`/user/addOrUpdate?id=${id}` : apiUrl+'/user/addOrUpdate';
+      const method = 'PUT';
 
       const res = await fetch(url, {
         method,
@@ -80,7 +88,7 @@ export default function ClientFormPage() {
 
       if (res.ok) {
         alert(isEdit ? 'Cliente atualizado com sucesso!' : 'Cliente cadastrado com sucesso!');
-        navigate('/clients');
+        navigate('/');
       } else {
         alert('Erro ao salvar os dados.');
       }
@@ -106,13 +114,13 @@ export default function ClientFormPage() {
               marginBottom: '1rem',
             }}
           >
-            <input name="nome" placeholder="Nome" value={form.nome} onChange={handleChange} />
+            <input name="name" placeholder="Nome" value={form.name} onChange={handleChange} />
             <input name="cpf" placeholder="CPF" value={form.cpf} onChange={handleChange} />
-            <input name="cep" placeholder="CEP" value={form.cep} onChange={handleChange} />
-            <input name="logradouro" placeholder="Logradouro" value={form.logradouro} onChange={handleChange} />
-            <input name="bairro" placeholder="Bairro" value={form.bairro} onChange={handleChange} />
-            <input name="cidade" placeholder="Cidade" value={form.cidade} onChange={handleChange} />
-            <input name="estado" placeholder="Estado (UF)" maxLength={2} value={form.estado} onChange={handleChange} />
+            <input name="postalCode" placeholder="CEP" value={form.postalCode} onChange={handleChange} />
+            <input name="street" placeholder="Logradouro" value={form.street} onChange={handleChange} />
+            <input name="neighborhood" placeholder="Bairro" value={form.neighborhood} onChange={handleChange} />
+            <input name="city" placeholder="Cidade" value={form.city} onChange={handleChange} />
+            <input name="state" placeholder="Estado (UF)" maxLength={2} value={form.state} onChange={handleChange} />
           </div>
 
           <div style={{ display: 'flex', gap: '1rem' }}>
