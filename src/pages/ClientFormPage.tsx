@@ -64,10 +64,8 @@ export default function ClientFormPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleClear = () => {
-    setForm(defaultForm);
-    setIsEdit(false);
-    navigate('/clients/new');
+  const backToHome = () => {
+    navigate('/');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,8 +122,8 @@ export default function ClientFormPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button type="button" onClick={handleClear}>
-              Apagar
+            <button type="button" onClick={backToHome}>
+              Voltar
             </button>
             <button type="submit">
               {isEdit ? 'Atualizar' : 'Cadastrar'}

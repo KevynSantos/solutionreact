@@ -1,11 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import "../Home.css";
+import { useNavigate } from 'react-router-dom';
+
 
 const Home = () => {
   const [registros, setRegistros] = useState([]);
   const [pagina, setPagina] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+
+  const navigate = useNavigate();
 
   const carregarRegistros = async () => {
     try {
@@ -16,6 +20,10 @@ const Home = () => {
     } catch (error) {
       console.error("Erro ao carregar registros:", error);
     }
+  };
+
+  const goEditAddress = (id) => {
+     navigate(`/clients/`+id);
   };
 
   useEffect(() => {
@@ -82,6 +90,12 @@ const Home = () => {
                     onClick={() => excluirRegistro(r.id)}
                   >
                     Excluir
+                  </button>
+                  <button
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    onClick={() => goEditAddress(r.id)}
+                  >
+                    Editar
                   </button>
                 </td>
               </tr>
