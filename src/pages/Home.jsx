@@ -26,6 +26,11 @@ const Home = () => {
      navigate(`/clients/`+id);
   };
 
+   const goAddAddress = () => {
+      navigate(`/clients/add`);
+   }
+
+
   useEffect(() => {
     carregarRegistros();
   }, [pagina, pageSize]);
@@ -55,7 +60,9 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white p-8">
       <h1 className="text-2xl font-bold mb-6 text-center">Lista de Endereços</h1>
-
+      <button className="btn-add-address btn-style" onClick={goAddAddress}>
+        Adicionar Endereço
+      </button>
       <div className="overflow-x-auto shadow rounded-lg">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead className="bg-gray-200">
@@ -86,13 +93,13 @@ const Home = () => {
                 <td className="p-2 border border-gray-300">{formatarData(r.updatedAt)}</td>
                 <td className="p-2 border border-gray-300">
                   <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded btn-style"
                     onClick={() => excluirRegistro(r.id)}
                   >
                     Excluir
                   </button>
                   <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded btn-style"
                     onClick={() => goEditAddress(r.id)}
                   >
                     Editar

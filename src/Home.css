@@ -40,3 +40,15 @@
 .read-the-docs {
   color: #888;
 }
+
+.btn-add-address
+{
+  margin-bottom: 40px;
+}
+
+.btn-style
+{
+  background-color: white;
+  color: black;
+  border-color: black;
+}

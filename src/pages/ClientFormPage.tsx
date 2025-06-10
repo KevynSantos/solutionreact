@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
+import "../ClientFormPage.css";
 
 type FormData = {
   name: string;
@@ -122,10 +122,10 @@ export default function ClientFormPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button type="button" onClick={backToHome}>
+            <button type="button" onClick={backToHome} className='btn-style'>
               Voltar
             </button>
-            <button type="submit">
+            <button type="submit" className='btn-style'>
               {isEdit ? 'Atualizar' : 'Cadastrar'}
             </button>
           </div>
