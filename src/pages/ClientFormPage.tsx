@@ -36,16 +36,14 @@ export default function ClientFormPage() {
         setLoading(true);
         try {
           const apiUrl = import.meta.env.VITE_API_URL;
-          const res = await fetch(apiUrl+`/user/findOne?id=${id}`);
+          const res = await fetch(apiUrl + `/user/findOne?id=${id}`);
           if (res.ok) {
             const json = await res.json();
-            if(json.user != null)
-            {
-                const data: FormData = json.user;
-                setForm(data);
-                setIsEdit(true);
+            if (json.user != null) {
+              const data: FormData = json.user;
+              setForm(data);
+              setIsEdit(true);
             }
-            
           } else {
             console.warn('Cliente não encontrado, permanecendo em modo de cadastro.');
           }
@@ -60,8 +58,34 @@ export default function ClientFormPage() {
     fetchClient();
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setForm((prevForm) => ({ ...prevForm, [name]: value }));
+
+    // Se o campo modificado for o CEP e tiver 8 dígitos, busca no ViaCEP
+    if (name === 'postalCode' && value.length === 8) {
+      const onlyDigits = value.replace(/\D/g, '');
+      if (onlyDigits.length <= 8) {
+          try {
+            const res = await fetch(`https://viacep.com.br/ws/${onlyDigits}/json/`);
+            const data = await res.json();
+            if (!data.erro) {
+              setForm((prevForm) => ({
+                ...prevForm,
+                street: data.logradouro || '',
+                neighborhood: data.bairro || '',
+                city: data.localidade || '',
+                state: data.uf || '',
+              }));
+            } else {
+              //alert('CEP não encontrado.');
+            }
+          } catch (error) {
+            console.error('Erro ao buscar CEP:', error);
+          }
+      }
+    }
   };
 
   const backToHome = () => {
@@ -73,7 +97,7 @@ export default function ClientFormPage() {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
-      const url = isEdit ? apiUrl+`/user/addOrUpdate?id=${id}` : apiUrl+'/user/addOrUpdate';
+      const url = isEdit ? apiUrl + `/user/addOrUpdate?id=${id}` : apiUrl + '/user/addOrUpdate';
       const method = 'PUT';
 
       const res = await fetch(url, {
@@ -114,7 +138,14 @@ export default function ClientFormPage() {
           >
             <input name="name" placeholder="Nome" value={form.name} onChange={handleChange} />
             <input name="cpf" placeholder="CPF" value={form.cpf} onChange={handleChange} />
-            <input name="postalCode" placeholder="CEP" value={form.postalCode} onChange={handleChange} />
+            <input
+              name="postalCode"
+              placeholder="CEP"
+              value={form.postalCode}
+              inputMode="numeric"
+              maxLength={8}
+              onChange={handleChange}
+            />
             <input name="street" placeholder="Logradouro" value={form.street} onChange={handleChange} />
             <input name="neighborhood" placeholder="Bairro" value={form.neighborhood} onChange={handleChange} />
             <input name="city" placeholder="Cidade" value={form.city} onChange={handleChange} />
