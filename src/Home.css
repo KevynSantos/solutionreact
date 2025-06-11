@@ -52,3 +52,26 @@
   color: black;
   border-color: black;
 }
+
+/* Espaço mínimo entre colunas para manter layout mesmo vazio */
+thead th {
+  border-bottom: 1px solid #d1d5db;
+  padding: 12px; /* ou ajuste conforme o seu layout */
+  min-width: 80px; /* força largura mínima */
+  text-align: left; /* opcional para melhor alinhamento */
+}
+
+/* Ajuste visual das células da tabela */
+tbody td {
+  border-bottom: none; /* remove os traços picotados */
+  padding: 12px;
+}
+
+/* Estrutura da tabela */
+table {
+  border-spacing: 0;
+  border-collapse: separate;
+  width: 100%;
+}
+
+
