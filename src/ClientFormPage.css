@@ -4,3 +4,12 @@
   color: black;
   border-color: black;
 }
+
+input
+{
+  width: 250px;
+  height: 25px;
+  background-color: white;
+  border: white;
+  color: black;
+}

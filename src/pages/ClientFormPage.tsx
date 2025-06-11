@@ -132,7 +132,7 @@ export default function ClientFormPage() {
       {loading ? (
         <p>Carregando dados...</p>
       ) : (
-        <form onSubmit={handleSubmit}>
+       <form onSubmit={handleSubmit}>
           <div
             style={{
               display: 'grid',
@@ -141,20 +141,47 @@ export default function ClientFormPage() {
               marginBottom: '1rem',
             }}
           >
-            <input name="name" placeholder="Nome" value={form.name} onChange={handleChange} />
-            <input name="cpf" placeholder="CPF" value={form.cpf} onChange={handleChange} />
-            <input
-              name="postalCode"
-              placeholder="CEP"
-              value={form.postalCode}
-              inputMode="numeric"
-              maxLength={8}
-              onChange={handleChange}
-            />
-            <input name="street" placeholder="Logradouro" value={form.street} onChange={handleChange} />
-            <input name="neighborhood" placeholder="Bairro" value={form.neighborhood} onChange={handleChange} />
-            <input name="city" placeholder="Cidade" value={form.city} onChange={handleChange} />
-            <input name="state" placeholder="Estado (UF)" maxLength={2} value={form.state} onChange={handleChange} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="name" style={{ marginBottom: '4px' }}>Nome</label>
+              <input id="name" name="name" value={form.name} onChange={handleChange} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="cpf" style={{ marginBottom: '4px' }}>CPF</label>
+              <input id="cpf" name="cpf" value={form.cpf} onChange={handleChange} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="postalCode" style={{ marginBottom: '4px' }}>CEP</label>
+              <input
+                id="postalCode"
+                name="postalCode"
+                value={form.postalCode}
+                inputMode="numeric"
+                maxLength={8}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="street" style={{ marginBottom: '4px' }}>Logradouro</label>
+              <input id="street" name="street" value={form.street} onChange={handleChange} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="neighborhood" style={{ marginBottom: '4px' }}>Bairro</label>
+              <input id="neighborhood" name="neighborhood" value={form.neighborhood} onChange={handleChange} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="city" style={{ marginBottom: '4px' }}>Cidade</label>
+              <input id="city" name="city" value={form.city} onChange={handleChange} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="state" style={{ marginBottom: '4px' }}>Estado (UF)</label>
+              <input id="state" name="state" maxLength={2} value={form.state} onChange={handleChange} />
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '1rem' }}>
@@ -166,6 +193,9 @@ export default function ClientFormPage() {
             </button>
           </div>
         </form>
+
+
+
       )}
       <ToastContainer />
     </div>
