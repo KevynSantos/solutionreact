@@ -23,15 +23,61 @@ const defaultForm: FormData = {
   state: '',
 };
 
+// Validação CPF
+function isCPFValid(cpf: string) {
+  cpf = cpf.replace(/[^\d]+/g, '');
+
+  if (cpf.length !== 11) return false;
+  if (/^(.)\1{10}$/.test(cpf)) return false;
+
+  let sum = 0;
+  let remainder;
+
+  for (let i = 1; i <= 9; i++) {
+    sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(10, 11))) return false;
+
+  return true;
+}
+
+// Validação se todos os campos estão preenchidos
+function isFormValid(form: FormData) {
+  return (
+    form.name.trim() !== '' &&
+    form.cpf.trim() !== '' &&
+    form.postalCode.trim() !== '' &&
+    form.street.trim() !== '' &&
+    form.neighborhood.trim() !== '' &&
+    form.city.trim() !== '' &&
+    form.state.trim() !== ''
+  );
+}
+
 export default function ClientFormPage() {
 
-  const notify = () => toast(isEdit?"Endereço Atualizado com sucesso":"Endereço Criado com sucesso");
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [form, setForm] = useState<FormData>(defaultForm);
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const notifySuccess = () =>
+    toast.success(isEdit ? "Endereço Atualizado com sucesso" : "Endereço Criado com sucesso");
+
+  const notifyError = (msg: string) =>
+    toast.error(msg);
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -66,27 +112,24 @@ export default function ClientFormPage() {
 
     setForm((prevForm) => ({ ...prevForm, [name]: value }));
 
-    // Se o campo modificado for o CEP e tiver 8 dígitos, busca no ViaCEP
     if (name === 'postalCode' && value.length === 8) {
       const onlyDigits = value.replace(/\D/g, '');
       if (onlyDigits.length <= 8) {
-          try {
-            const res = await fetch(`https://viacep.com.br/ws/${onlyDigits}/json/`);
-            const data = await res.json();
-            if (!data.erro) {
-              setForm((prevForm) => ({
-                ...prevForm,
-                street: data.logradouro || '',
-                neighborhood: data.bairro || '',
-                city: data.localidade || '',
-                state: data.uf || '',
-              }));
-            } else {
-              //alert('CEP não encontrado.');
-            }
-          } catch (error) {
-            console.error('Erro ao buscar CEP:', error);
+        try {
+          const res = await fetch(`https://viacep.com.br/ws/${onlyDigits}/json/`);
+          const data = await res.json();
+          if (!data.erro) {
+            setForm((prevForm) => ({
+              ...prevForm,
+              street: data.logradouro || '',
+              neighborhood: data.bairro || '',
+              city: data.localidade || '',
+              state: data.uf || '',
+            }));
           }
+        } catch (error) {
+          console.error('Erro ao buscar CEP:', error);
+        }
       }
     }
   };
@@ -98,6 +141,17 @@ export default function ClientFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validações antes do envio
+    if (!isFormValid(form)) {
+      notifyError('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    if (!isCPFValid(form.cpf)) {
+      notifyError('CPF inválido. Por favor, insira um CPF válido.');
+      return;
+    }
+
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
       const url = isEdit ? apiUrl + `/user/addOrUpdate?id=${id}` : apiUrl + '/user/addOrUpdate';
@@ -105,23 +159,21 @@ export default function ClientFormPage() {
 
       const res = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
 
       if (res.ok) {
-        notify();
+        notifySuccess();
         setTimeout(() => {
           navigate('/');
-        }, 2000); // espera 2 segundos
+        }, 2000);
       } else {
-        alert('Erro ao salvar os dados.');
+        notifyError('Erro ao salvar os dados.');
       }
     } catch (error) {
       console.error('Erro ao enviar formulário:', error);
-      alert('Erro na requisição.');
+      notifyError('Erro na requisição.');
     }
   };
 
@@ -132,7 +184,7 @@ export default function ClientFormPage() {
       {loading ? (
         <p>Carregando dados...</p>
       ) : (
-       <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div
             style={{
               display: 'grid',
@@ -141,62 +193,42 @@ export default function ClientFormPage() {
               marginBottom: '1rem',
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="name" style={{ marginBottom: '4px' }}>Nome</label>
-              <input id="name" name="name" value={form.name} onChange={handleChange} />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="cpf" style={{ marginBottom: '4px' }}>CPF</label>
-              <input id="cpf" name="cpf" value={form.cpf} onChange={handleChange} />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="postalCode" style={{ marginBottom: '4px' }}>CEP</label>
-              <input
-                id="postalCode"
-                name="postalCode"
-                value={form.postalCode}
-                inputMode="numeric"
-                maxLength={8}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="street" style={{ marginBottom: '4px' }}>Logradouro</label>
-              <input id="street" name="street" value={form.street} onChange={handleChange} />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="neighborhood" style={{ marginBottom: '4px' }}>Bairro</label>
-              <input id="neighborhood" name="neighborhood" value={form.neighborhood} onChange={handleChange} />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="city" style={{ marginBottom: '4px' }}>Cidade</label>
-              <input id="city" name="city" value={form.city} onChange={handleChange} />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="state" style={{ marginBottom: '4px' }}>Estado (UF)</label>
-              <input id="state" name="state" maxLength={2} value={form.state} onChange={handleChange} />
-            </div>
+            {/** Campos do formulário com label e input **/}
+            {['name', 'cpf', 'postalCode', 'street', 'neighborhood', 'city', 'state'].map((field) => (
+              <div
+                key={field}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
+              >
+                <label htmlFor={field} style={{ marginBottom: '4px', textTransform: 'capitalize' }}>
+                  {field === 'postalCode' ? 'CEP' :
+                   field === 'street' ? 'Logradouro' :
+                   field === 'neighborhood' ? 'Bairro' :
+                   field === 'state' ? 'Estado (UF)' :
+                   field}
+                </label>
+                <input
+                  id={field}
+                  name={field}
+                  value={(form as any)[field]}
+                  onChange={handleChange}
+                  maxLength={field === 'state' ? 2 : undefined}
+                  inputMode={field === 'postalCode' ? 'numeric' : undefined}
+                />
+              </div>
+            ))}
           </div>
 
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button type="button" onClick={backToHome} className='btn-style'>
+            <button type="button" onClick={backToHome} className="btn-style">
               Voltar
             </button>
-            <button type="submit" className='btn-style'>
+            <button type="submit" className="btn-style">
               {isEdit ? 'Atualizar' : 'Cadastrar'}
             </button>
           </div>
         </form>
-
-
-
       )}
+
       <ToastContainer />
     </div>
   );

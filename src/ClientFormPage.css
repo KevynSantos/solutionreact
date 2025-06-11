@@ -13,3 +13,15 @@ input
   border: white;
   color: black;
 }
+
+input:-webkit-autofill {
+  /* Cor de fundo que você quer quando tem autofill */
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+
+  /* Cor do texto */
+  -webkit-text-fill-color: black !important;
+
+  /* Remove qualquer transição padrão */
+  transition: background-color 5000s ease-in-out 0s;
+}
