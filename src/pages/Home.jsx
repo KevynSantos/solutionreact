@@ -2,12 +2,14 @@
 import React, { useEffect, useState } from "react";
 import "../Home.css";
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const Home = () => {
   const [registros, setRegistros] = useState([]);
   const [pagina, setPagina] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const notify = () => toast("Endereço excluído com sucesso");
 
   const navigate = useNavigate();
 
@@ -42,6 +44,7 @@ const Home = () => {
         method: "DELETE",
       });      
       carregarRegistros(); // Recarrega após exclusão
+      notify();
     } catch (error) {
       console.error("Erro ao excluir registro:", error);
     }
@@ -80,36 +83,46 @@ const Home = () => {
             </tr>
           </thead>
           <tbody>
-            {currentData.map((r) => (
-              <tr key={r.cpf} className="odd:bg-white even:bg-gray-100">
-                <td className="p-2 border border-gray-300">{r.name}</td>
-                <td className="p-2 border border-gray-300">{r.cpf}</td>
-                <td className="p-2 border border-gray-300">{r.postalCode}</td>
-                <td className="p-2 border border-gray-300">{r.street}</td>
-                <td className="p-2 border border-gray-300">{r.neighborhood}</td>
-                <td className="p-2 border border-gray-300">{r.city}</td>
-                <td className="p-2 border border-gray-300">{r.state}</td>
-                <td className="p-2 border border-gray-300">{formatarData(r.createAt)}</td>
-                <td className="p-2 border border-gray-300">{formatarData(r.updatedAt)}</td>
-                <td className="p-2 border border-gray-300">
-                  <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded btn-style"
-                    onClick={() => excluirRegistro(r.id)}
-                  >
-                    Excluir
-                  </button>
-                  <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded btn-style"
-                    onClick={() => goEditAddress(r.id)}
-                  >
-                    Editar
-                  </button>
+            {currentData.length === 0 ? (
+              <tr>
+                <td colSpan={10} className="text-center p-4 text-gray-500">
+                  Nenhum endereço encontrado.
                 </td>
               </tr>
-            ))}
+            ) : (
+              currentData.map((r) => (
+                <tr key={r.cpf} className="odd:bg-white even:bg-gray-100">
+                  <td className="p-2 border border-gray-300">{r.name}</td>
+                  <td className="p-2 border border-gray-300">{r.cpf}</td>
+                  <td className="p-2 border border-gray-300">{r.postalCode}</td>
+                  <td className="p-2 border border-gray-300">{r.street}</td>
+                  <td className="p-2 border border-gray-300">{r.neighborhood}</td>
+                  <td className="p-2 border border-gray-300">{r.city}</td>
+                  <td className="p-2 border border-gray-300">{r.state}</td>
+                  <td className="p-2 border border-gray-300">{formatarData(r.createAt)}</td>
+                  <td className="p-2 border border-gray-300">{formatarData(r.updatedAt)}</td>
+                  <td className="p-2 border border-gray-300">
+                    <button
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded btn-style"
+                      onClick={() => excluirRegistro(r.id)}
+                    >
+                      Excluir
+                    </button>
+                    <button
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded btn-style"
+                      onClick={() => goEditAddress(r.id)}
+                    >
+                      Editar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
+
         </table>
       </div>
+      <ToastContainer />
     </div>
   );
 };

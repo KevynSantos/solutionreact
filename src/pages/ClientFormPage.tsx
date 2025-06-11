@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import "../ClientFormPage.css";
+import { ToastContainer, toast } from 'react-toastify';
 
 type FormData = {
   name: string;
@@ -23,6 +24,8 @@ const defaultForm: FormData = {
 };
 
 export default function ClientFormPage() {
+
+  const notify = () => toast(isEdit?"Endereço Atualizado com sucesso":"Endereço Criado com sucesso");
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -109,8 +112,10 @@ export default function ClientFormPage() {
       });
 
       if (res.ok) {
-        alert(isEdit ? 'Cliente atualizado com sucesso!' : 'Cliente cadastrado com sucesso!');
-        navigate('/');
+        notify();
+        setTimeout(() => {
+          navigate('/');
+        }, 2000); // espera 2 segundos
       } else {
         alert('Erro ao salvar os dados.');
       }
@@ -162,6 +167,7 @@ export default function ClientFormPage() {
           </div>
         </form>
       )}
+      <ToastContainer />
     </div>
   );
 }
